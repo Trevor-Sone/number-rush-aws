@@ -15,6 +15,12 @@ This project demonstrates hands-on experience in **AWS cloud architecture**, usi
 
 ---
 
+## 🚀 Live Demo
+
+Play the game: https://d3hcutenmgefoj.cloudfront.net/
+
+---
+
 ## 🏗️ Architecture
 
 The architecture follows a **serverless and event-driven design**:

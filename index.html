@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Rush - Guess The Number Quickly!</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            font-weight: 300;
+            position: relative;
+        }
+
+        .game-info-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .info-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            min-height: 550px;
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 350px;
+            padding: 30px;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panel {
+            flex: 1;
+            min-width: 350px;
+            padding: 30px;
+            background: rgba(248, 250, 252, 0.7);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            width: 100%;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button:disabled::before {
+            display: none;
+        }
+
+        .attempts-display {
+            display: flex;
+            margin: 20px 0;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .attempt-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .attempt-dot.used {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            transform: scale(1.1);
+            box-shadow: 0 3px 6px rgba(239, 68, 68, 0.3);
+        }
+
+        .attempt-dot.used::after {
+            content: '✕';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .game-info {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .game-info h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .guess-history {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .guess-item {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .guess-item:last-child {
+            border-bottom: none;
+        }
+
+        .guess-item.correct {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-radius: 8px;
+            animation: celebrate 0.5s ease;
+            border-left: 4px solid var(--success);
+        }
+
+        .guess-item.very-close {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            animation: pulse 0.5s ease;
+            border-left: 4px solid var(--warning);
+        }
+
+        .guess-item.close {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            animation: pulse 0.5s ease;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .guess-item.far {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 4px solid var(--danger);
+        }
+
+        .leaderboard {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: white;
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 80px 60px;
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .leaderboard-item:hover {
+            background: #f8fafc;
+        }
+
+        .leaderboard-header {
+            font-weight: 700;
+            background: #f1f5f9;
+            color: var(--dark);
+        }
+
+        .first-place {
+            background: linear-gradient(135deg, #fffbeb 0%, #fed7aa 100%);
+            font-weight: 700;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .second-place {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            font-weight: 700;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .third-place {
+            background: linear-gradient(135deg, #faf5ff 0%, #e9d5ff 100%);
+            font-weight: 700;
+            border-left: 4px solid #a855f7;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            border-left: 4px solid;
+        }
+
+        .status-message.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left-color: var(--success);
+            animation: pulse 0.5s ease;
+        }
+
+        .status-message.error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #7f1d1d;
+            border-left-color: var(--danger);
+            animation: shake 0.5s ease;
+        }
+
+        .status-message.info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e3a8a;
+            border-left-color: #3b82f6;
+        }
+
+        .winner-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 5px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.4);
+        }
+
+        .new-game-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            margin-top: 15px;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+        }
+
+        .new-game-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.05) rotate(2deg); }
+            50% { transform: scale(1.05) rotate(-2deg); }
+            75% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Victory Animation */
+        .victory-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            opacity: 0;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .victory-modal {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0);
+            animation: modalAppear 0.5s forwards;
+            z-index: 1001;
+            max-width: 500px;
+            width: 90%;
+            pointer-events: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .victory-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--success), var(--warning), var(--primary));
+        }
+
+        @keyframes modalAppear {
+            0% { transform: scale(0) rotate(-10deg); }
+            70% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .victory-title {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .victory-message {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--gray);
+        }
+
+        .perfect-score {
+            color: var(--warning);
+            font-weight: bold;
+            animation: pulse 1s infinite;
+            font-size: 1.2rem;
+        }
+
+        .close-victory {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+        }
+
+        .close-victory:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Achievement badges */
+        .achievements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .badge {
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+            border: 1px solid #e2e8f0;
+        }
+
+        .badge.unlocked {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge.gold {
+            background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .badge.silver {
+            background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+            color: #374151;
+            border-color: #9ca3af;
+        }
+
+        .badge.bronze {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            color: #92400e;
+            border-color: #f97316;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .victory-modal {
+                padding: 25px;
+                max-width: 90%;
+            }
+
+            .victory-title {
+                font-size: 2.2rem;
+            }
+            
+            .leaderboard-item {
+                grid-template-columns: 40px 1fr 70px 50px;
+                font-size: 0.9rem;
+                padding: 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .panel-title {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Number Rush</h1>
+            <p class="subtitle">How quickly can you guess the number?</p>
+            <div class="game-info-bar">
+                <div class="info-item">
+                    <div class="info-label">Time</div>
+                    <div class="info-value" id="timer">⏱️ 00:00</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Attempts Left</div>
+                    <div class="info-value" id="attempts-left">🎯 5</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Games Played</div>
+                    <div class="info-value" id="games-played">🎮 0</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="game-area">
+            <div class="left-panel">
+                <h2 class="panel-title">Make Your Guess</h2>
+                
+                <div class="game-info">
+                    <p>I'm thinking of a number between <strong>1 and 100</strong>.</p>
+                    <p>Guess it correctly in 5 attempts or less!</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Your Username:</label>
+                    <div class="input-with-icon">
+                        <input type="text" id="username" placeholder="Enter your username">
+                        <span class="input-icon">👤</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="guess">Your Guess (1-100):</label>
+                    <div class="input-with-icon">
+                        <input type="number" id="guess" min="1" max="100" placeholder="Enter your guess">
+                        <span class="input-icon">🔢</span>
+                    </div>
+                </div>
+                
+                <button id="submit-guess">Submit Guess</button>
+                <button id="new-game" class="new-game-btn">Start New Game</button>
+                
+                <div class="attempts-display">
+                    <div class="attempt-dot" id="attempt-1"></div>
+                    <div class="attempt-dot" id="attempt-2"></div>
+                    <div class="attempt-dot" id="attempt-3"></div>
+                    <div class="attempt-dot" id="attempt-4"></div>
+                    <div class="attempt-dot" id="attempt-5"></div>
+                </div>
+                
+                <div id="status-message" class="status-message info">
+                    Enter your username and first guess to start the game!
+                </div>
+                
+                <h3 class="panel-title">Your Guess History</h3>
+                <div id="guess-history" class="guess-history">
+                    <!-- Guess history will be populated here -->
+                </div>
+
+                <div class="achievements">
+                    <div class="badge" id="first-win-badge">🥇 First Win</div>
+                    <div class="badge" id="quick-win-badge">⚡ Fast Guess</div>
+                    <div class="badge" id="perfect-score-badge">🎯 Perfect Score</div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <h2 class="panel-title">All-Time Leaderboard</h2>
+                <p>Top players based on total wins and speed!</p>
+                
+                <div id="leaderboard" class="leaderboard">
+                    <div class="leaderboard-item leaderboard-header">
+                        <span>Rank</span>
+                        <span>Player</span>
+                        <span>Time</span>
+                        <span>Wins</span>
+                    </div>
+                    <div class="leaderboard-item">
+                        <span colspan="4" style="text-align: center; padding: 20px;">
+                            Loading leaderboard...
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="game-info">
+                    <h3>How to Play</h3>
+                    <ol>
+                        <li>Enter a username and your guess between 1-100</li>
+                        <li>You have only 5 attempts to guess the number</li>
+                        <li>Try to guess as quickly as possible</li>
+                        <li>Leaderboard ranks players by total wins and speed</li>
+                        <li>Game ends after 5 incorrect guesses or when you guess correctly</li>
+                    </ol>
+                </div>
+
+                <div class="game-info">
+                    <h3>Session Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="session-wins">0</div>
+                            <div class="stat-label">Wins</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="avg-time">00:00</div>
+                            <div class="stat-label">Avg Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="best-time">00:00</div>
+                            <div class="stat-label">Best Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="accuracy">0%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="victory-container" class="victory-animation">
+        <div class="victory-modal">
+            <h2 class="victory-title">Congratulations!</h2>
+            <p class="victory-message" id="victory-message">You guessed the number in <span id="victory-time">00:00</span>!</p>
+            <p id="perfect-score-message" class="perfect-score" style="display: none;">PERFECT SCORE! Amazing guess! 🎯</p>
+            <button class="close-victory" id="close-victory">Continue Playing</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+    const API_BASE_URL = 'INSERT YOUR API INVOKE URL AFTER DEPLOYING';
+    const ENDPOINTS = {
+        getLeaderboard: `${API_BASE_URL}/leaderboard/`,  // Added trailing slash
+        submitScore: `${API_BASE_URL}/score/`           // Added trailing slash
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        const usernameInput = document.getElementById('username');
+        const guessInput = document.getElementById('guess');
+        const submitButton = document.getElementById('submit-guess');
+        const newGameButton = document.getElementById('new-game');
+        const statusMessage = document.getElementById('status-message');
+        const guessHistory = document.getElementById('guess-history');
+        const leaderboard = document.getElementById('leaderboard');
+        const timerElement = document.getElementById('timer');
+        const attemptsLeftElement = document.getElementById('attempts-left');
+        const gamesPlayedElement = document.getElementById('games-played');
+        const victoryContainer = document.getElementById('victory-container');
+        const victoryTimeElement = document.getElementById('victory-time');
+        const victoryMessageElement = document.getElementById('victory-message');
+        const perfectScoreMessage = document.getElementById('perfect-score-message');
+        const closeVictoryButton = document.getElementById('close-victory');
+        const sessionWinsElement = document.getElementById('session-wins');
+        const avgTimeElement = document.getElementById('avg-time');
+        const bestTimeElement = document.getElementById('best-time');
+        
+        // Game state
+        let gameState = {
+            secretNumber: Math.floor(Math.random() * 100) + 1,
+            attempts: 5,
+            gameStartTime: null,
+            timerInterval: null,
+            allGuesses: [],
+            gameActive: false,
+            gamesPlayed: 0,
+            sessionWins: 0,
+            sessionTimes: [],
+            bestTime: null
+        };
+        
+        // TEST FUNCTION - debug
+        async function testEndpoints() {
+            console.log('🔧 Testing API endpoints...');
+            
+            try {
+                // Test leaderboard endpoint
+                console.log('Testing GET /leaderboard...');
+                const leaderboardResponse = await fetch(ENDPOINTS.getLeaderboard, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log('Leaderboard Status:', leaderboardResponse.status, leaderboardResponse.statusText);
+                
+                if (leaderboardResponse.ok) {
+                    const leaderboardData = await leaderboardResponse.json();
+                    console.log('Leaderboard Data:', leaderboardData);
+                }
+                
+                // Testing score endpoint with a simple request
+                console.log('Testing POST /score...');
+                const testScoreData = {
+                    username: 'test-user',
+                    time: 60,
+                    attemptsUsed: 3,
+                    timestamp: new Date().toISOString()
+                };
+                
+                const scoreResponse = await fetch(ENDPOINTS.submitScore, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testScoreData)
+                });
+                console.log('Score Status:', scoreResponse.status, scoreResponse.statusText);
+                
+                if (scoreResponse.ok) {
+                    const scoreData = await scoreResponse.json();
+                    console.log('Score Response:', scoreData);
+                } else {
+                    const errorText = await scoreResponse.text();
+                    console.error('Score Error:', errorText);
+                }
+                
+            } catch (error) {
+                console.error('❌ Endpoint test failed:', error);
+            }
+        }
+        
+        // IMPROVED API Functions
+        async function getLeaderboard() {
+            try {
+                console.log('📊 Fetching leaderboard...');
+                const response = await fetch(ENDPOINTS.getLeaderboard, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                console.log('Leaderboard Response Status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Leaderboard Data Received:', data);
+                return data.leaderboard || [];
+            } catch (error) {
+                console.error('❌ Error fetching leaderboard:', error);
+                statusMessage.textContent = 'Error loading leaderboard. Using local data.';
+                statusMessage.className = 'status-message error';
+                
+                // Return empty array instead of sample data
+                return [];
+            }
+        }
+        
+        async function submitScore(username, time, attemptsUsed) {
+            try {
+                const scoreData = {
+                    username: username,
+                    time: time,
+                    attemptsUsed: attemptsUsed,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('📨 Submitting score:', scoreData);
+                
+                const response = await fetch(ENDPOINTS.submitScore, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(scoreData)
+                });
+                
+                console.log('Score Submission Status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('Score Submission Result:', result);
+                return result.success;
+            } catch (error) {
+                console.error('❌ Error submitting score:', error);
+                statusMessage.textContent = 'Error submitting score to leaderboard.';
+                statusMessage.className = 'status-message error';
+                return false;
+            }
+        }
+        
+    
+        // Initialize the game
+        function initGame() {
+            gameState.secretNumber = Math.floor(Math.random() * 100) + 1;
+            gameState.attempts = 5;
+            gameState.allGuesses = [];
+            gameState.gameActive = true;
+            
+            // Update UI
+            updateAttemptsDisplay();
+            guessHistory.innerHTML = '';
+            statusMessage.textContent = 'Game started! Make your first guess.';
+            statusMessage.className = 'status-message info';
+            submitButton.disabled = false;
+            guessInput.disabled = false;
+            
+            // Start timer
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            gameState.gameStartTime = new Date();
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+            
+            // Update leaderboard
+            updateLeaderboard();
+        }
+        
+        // Update timer display
+        function updateTimer() {
+            if (!gameState.gameStartTime || !gameState.gameActive) return;
+            
+            const now = new Date();
+            const elapsed = Math.floor((now - gameState.gameStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Stop the timer
+        function stopTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+        }
+        
+        // Update attempts display
+        function updateAttemptsDisplay() {
+            attemptsLeftElement.textContent = gameState.attempts;
+            
+            // Update attempt dots
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`attempt-${i}`);
+                if (dot) {
+                    dot.className = `attempt-dot ${i > gameState.attempts ? 'used' : ''}`;
+                }
+            }
+        }
+        
+        // Format time for display
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Format total time for display
+        function formatTotalTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}m ${secs}s`;
+        }
+        
+        // Update leaderboard display
+        async function updateLeaderboard() {
+            try {
+                leaderboard.classList.add('loading');
+                const leaderboardData = await getLeaderboard();
+                
+                // Sort by wins first (descending), then by total time (ascending)
+                leaderboardData.sort((a, b) => {
+                    if (b.wins !== a.wins) {
+                        return b.wins - a.wins;
+                    }
+                    return a.totalTime - b.totalTime;
+                });
+                
+                // Update the leaderboard UI
+                leaderboard.innerHTML = `
+                    <div class="leaderboard-item leaderboard-header">
+                        <span>Rank</span>
+                        <span>Player</span>
+                        <span>Time</span>
+                        <span>Wins</span>
+                    </div>
+                `;
+                
+                if (leaderboardData.length === 0) {
+                    leaderboard.innerHTML += `
+                        <div class="leaderboard-item">
+                            <span colspan="4" style="text-align: center; padding: 20px;">
+                                No scores yet! Be the first to play!
+                            </span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                leaderboardData.slice(0, 10).forEach((player, index) => {
+                    const item = document.createElement('div');
+                    
+                    // Apply special styling for top 3 positions
+                    if (index === 0) {
+                        item.className = 'leaderboard-item first-place';
+                    } else if (index === 1) {
+                        item.className = 'leaderboard-item second-place';
+                    } else if (index === 2) {
+                        item.className = 'leaderboard-item third-place';
+                    } else {
+                        item.className = 'leaderboard-item';
+                    }
+                    
+                    const rank = index + 1;
+                    const rankElement = rank === 1 ? 
+                        `<span><span class="winner-badge">${rank}</span></span>` :
+                        `<span>${rank}</span>`;
+                    
+                    const timeDisplay = player.wins > 0 ? formatTotalTime(player.totalTime) : '--';
+                    const winsDisplay = player.wins > 0 ? player.wins : '0';
+                    
+                    item.innerHTML = `
+                        ${rankElement}
+                        <span>${player.username}</span>
+                        <span>${timeDisplay}</span>
+                        <span>${winsDisplay}</span>
+                    `;
+                    
+                    leaderboard.appendChild(item);
+                });
+                
+            } catch (error) {
+                console.error('Error updating leaderboard:', error);
+                leaderboard.innerHTML = `
+                    <div class="leaderboard-item">
+                        <span colspan="4" style="text-align: center; padding: 20px; color: red;">
+                            Error loading leaderboard
+                        </span>
+                    </div>
+                `;
+            } finally {
+                leaderboard.classList.remove('loading');
+            }
+        }
+        
+        // Update session stats
+        function updateSessionStats() {
+            sessionWinsElement.textContent = gameState.sessionWins;
+            
+            if (gameState.sessionTimes.length > 0) {
+                const totalTime = gameState.sessionTimes.reduce((sum, time) => sum + time, 0);
+                const avgTime = Math.round(totalTime / gameState.sessionTimes.length);
+                avgTimeElement.textContent = formatTime(avgTime);
+            } else {
+                avgTimeElement.textContent = "00:00";
+            }
+            
+            if (gameState.bestTime) {
+                bestTimeElement.textContent = formatTime(gameState.bestTime);
+            } else {
+                bestTimeElement.textContent = "00:00";
+            }
+        }
+        
+        // Update guess history display
+        function updateGuessHistory() {
+            guessHistory.innerHTML = '';
+            
+            // Show only the current user's guesses
+            const userGuesses = gameState.allGuesses
+                .filter(guess => guess.username === usernameInput.value)
+                .sort((a, b) => b.timestamp - a.timestamp); // Newest first
+            
+            userGuesses.forEach(guess => {
+                const item = document.createElement('div');
+                const difference = Math.abs(guess.guess - gameState.secretNumber);
+                
+                // Determine feedback level
+                if (difference === 0) {
+                    item.className = 'guess-item correct';
+                    item.innerHTML = `
+                        <span>Guess: ${guess.guess}</span>
+                        <span>Correct! 🎉</span>
+                        <span>${formatTime(guess.time)}</span>
+                    `;
+                } else if (difference <= 5) {
+                    item.className = 'guess-item very-close';
+                    item.innerHTML = `
+                        <span>Guess: ${guess.guess}</span>
+                        <span>Very close! 🔥</span>
+                        <span>${formatTime(guess.time)}</span>
+                    `;
+                } else if (difference <= 10) {
+                    item.className = 'guess-item close';
+                    item.innerHTML = `
+                        <span>Guess: ${guess.guess}</span>
+                        <span>Close! 👍</span>
+                        <span>${formatTime(guess.time)}</span>
+                    `;
+                } else {
+                    item.className = 'guess-item far';
+                    const direction = guess.guess < gameState.secretNumber ? 'low' : 'high';
+                    item.innerHTML = `
+                        <span>Guess: ${guess.guess}</span>
+                        <span>Too ${direction} 👎</span>
+                        <span>${formatTime(guess.time)}</span>
+                    `;
+                }
+                
+                guessHistory.appendChild(item);
+            });
+        }
+        
+        // Create victory animation with confetti
+        function showVictoryAnimation(isFirstTry) {
+            victoryContainer.style.display = 'flex';
+            
+            const elapsed = Math.floor((new Date() - gameState.gameStartTime) / 1000);
+            victoryTimeElement.textContent = formatTime(elapsed);
+            
+            if (isFirstTry) {
+                victoryMessageElement.textContent = 'INCREDIBLE! You guessed it on your first try!';
+                perfectScoreMessage.style.display = 'block';
+                document.getElementById('perfect-score-badge').classList.add('gold');
+            } else {
+                const attemptsUsed = 5 - gameState.attempts;
+                victoryMessageElement.textContent = `You guessed the number in ${attemptsUsed} attempts!`;
+                perfectScoreMessage.style.display = 'none';
+            }
+            
+            // Create confetti
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                victoryContainer.appendChild(confetti);
+            }
+        }
+        
+        // Close victory animation
+        function closeVictory() {
+            victoryContainer.style.display = 'none';
+            // Remove all confetti elements
+            while (victoryContainer.children.length > 1) {
+                victoryContainer.removeChild(victoryContainer.lastChild);
+            }
+        }
+        
+        // Handle guess submission
+        async function submitGuess() {
+            if (!gameState.gameActive) {
+                statusMessage.textContent = 'Game over! Start a new game to play again.';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+            
+            const username = usernameInput.value.trim() || "Player";
+            const guess = parseInt(guessInput.value);
+            
+            // Validate input
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                statusMessage.textContent = 'Please enter a valid number between 1 and 100!';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+            
+            // Calculte difference
+            const difference = Math.abs(guess - gameState.secretNumber);
+            const timestamp = new Date();
+            const elapsedTime = timestamp - gameState.gameStartTime;
+            const elapsedSeconds = Math.floor(elapsedTime / 1000);
+            
+            // Use an attempt
+            gameState.attempts--;
+            updateAttemptsDisplay();
+            
+            // Add to all guesses
+            gameState.allGuesses.push({
+                username: username,
+                guess: guess,
+                timestamp: timestamp,
+                time: elapsedSeconds
+            });
+            
+            // Update UI based on response
+            if (difference === 0) {
+                // Correct guess!
+                const isFirstTry = gameState.attempts === 4; // 5-1=4 means first try
+                const attemptsUsed = 5 - gameState.attempts;
+                
+                statusMessage.textContent = `Congratulations ${username}! You guessed the correct number in ${formatTime(elapsedSeconds)}!`;
+                statusMessage.className = 'status-message success';
+                
+                // Stop the timer
+                stopTimer();
+                
+                // Update games played
+                gameState.gamesPlayed++;
+                gamesPlayedElement.textContent = gameState.gamesPlayed;
+                
+                // Update session stats
+                gameState.sessionWins++;
+                gameState.sessionTimes.push(elapsedSeconds);
+                if (!gameState.bestTime || elapsedSeconds < gameState.bestTime) {
+                    gameState.bestTime = elapsedSeconds;
+                    if (elapsedSeconds < 30) {
+                        document.getElementById('quick-win-badge').classList.add('silver');
+                    }
+                }
+                updateSessionStats();
+                
+                // Submit score to leaderboard
+                await submitScore(username, elapsedSeconds, attemptsUsed);
+                
+                // Award first win badge
+                if (gameState.sessionWins === 1) {
+                    document.getElementById('first-win-badge').classList.add('bronze');
+                }
+                
+                // Show victory animation
+                showVictoryAnimation(isFirstTry);
+                
+                // End game
+                gameState.gameActive = false;
+                submitButton.disabled = true;
+                guessInput.disabled = true;
+                
+                // Update leaderboard
+                updateLeaderboard();
+                
+            } else if (gameState.attempts === 0) {
+                // Game over - no attempts left
+                statusMessage.textContent = `Game Over! The number was ${gameState.secretNumber}. Better luck next time!`;
+                statusMessage.className = 'status-message error';
+                
+                // Stop the timer
+                stopTimer();
+                
+                // Update games played
+                gameState.gamesPlayed++;
+                gamesPlayedElement.textContent = gameState.gamesPlayed;
+                
+                gameState.gameActive = false;
+                submitButton.disabled = true;
+                guessInput.disabled = true;
+                
+            } else {
+                // Provide feedback
+                if (difference <= 5) {
+                    statusMessage.textContent = `Very close, ${username}! Try again.`;
+                    statusMessage.className = 'status-message info';
+                } else if (difference <= 10) {
+                    statusMessage.textContent = `Close, ${username}! Try again.`;
+                    statusMessage.className = 'status-message info';
+                } else {
+                    const direction = guess < gameState.secretNumber ? 'low' : 'high';
+                    statusMessage.textContent = `Too ${direction}, ${username}! Try again.`;
+                    statusMessage.className = 'status-message info';
+                }
+            }
+            
+            // Update displays
+            updateGuessHistory();
+            
+            // Clear the guess input
+            guessInput.value = '';
+        }
+        
+        // Event listeners
+        submitButton.addEventListener('click', submitGuess);
+        
+        guessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitGuess();
+            }
+        });
+        
+        newGameButton.addEventListener('click', initGame);
+        
+        closeVictoryButton.addEventListener('click', closeVictory);
+        
+        // Initialize the UI
+        updateLeaderboard();
+        updateSessionStats();
+        initGame();
+        
+        // Test endpoints when page loads
+        //setTimeout(testEndpoints, 1000);
+    });
+    </script>
+</body>
+</html>

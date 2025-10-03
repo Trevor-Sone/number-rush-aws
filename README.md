@@ -6,7 +6,7 @@ This project demonstrates hands-on experience in **AWS cloud architecture**, usi
 ---
 
 ## 🚀 Features
-- Web-based game built with **HTML, CSS, and JavaScript**.
+- Web-based game built with **HTML embedded with CSS, and JavaScript**.
 - **Real-time leaderboard** where players can submit and view scores.
 - Fully serverless backend powered by **AWS Lambda, DynamoDB, and API Gateway**.
 - **CloudFront distribution** for low-latency, globally accessible content.
@@ -36,7 +36,7 @@ The architecture follows a **serverless and event-driven design**:
 [Amazon DynamoDB (Leaderboard Storage)]
 
 
-- **Amazon S3** → Hosts the static web assets (HTML, CSS, JS).  
+- **Amazon S3** → Hosts the static web assets (HTML embedded with CSS, JS).  
 - **Amazon CloudFront** → Provides a fast, cached, globally distributed version of the game.  
 - **Amazon API Gateway** → Exposes REST endpoints for score submission & leaderboard retrieval.  
 - **AWS Lambda** → Handles business logic (submit score, fetch leaderboard).  
@@ -47,7 +47,7 @@ The architecture follows a **serverless and event-driven design**:
 ---
 
 ## ⚙️ Tech Stack
-- **Frontend:** HTML, CSS, JavaScript  
+- **Frontend:** HTML embedded with CSS, JavaScript  
 - **Backend:** AWS Lambda (Python)  
 - **Database:** Amazon DynamoDB  
 - **Cloud Services:** S3, CloudFront, API Gateway, IAM, CloudWatch  
@@ -57,24 +57,21 @@ The architecture follows a **serverless and event-driven design**:
 
 ## 🔧 Setup Instructions
 
-### 1. Clone the Repository
-git clone https://github.com/Trevor-Sone/number-rush.git
-cd number-rush
-### 2. Frontend Deployment
-Upload the index.html, style.css, and script.js files to an S3 bucket.
+### 1. Frontend Deployment
+Upload the index.html (style.css, script.js embedded) files to an S3 bucket.
 
 Enable static website hosting in S3.
 
 Set bucket policy to allow public read access (or serve privately through CloudFront).
 
-### 3. CloudFront Distribution
+### 2. CloudFront Distribution
 Create a CloudFront distribution pointing to the S3 bucket as origin.
 
 Configure default root object → index.html.
 
 Optional: Add custom domain (Route 53) and SSL certificate (ACM).
 
-### 4. Backend Deployment
+### 3. Backend Deployment
 Create DynamoDB table for storing scores (e.g., Leaderboard with PlayerName and Score attributes).
 
 Create Lambda functions:
@@ -87,7 +84,7 @@ Connect functions to API Gateway REST endpoints (/score, /leaderboard).
 
 Enable CORS for both endpoints.
 
-### 5. Testing
+### 4. Testing
 Access the CloudFront distribution URL.
 
 Play the game, submit scores, and check the leaderboard updates in real-time.
